@@ -6,6 +6,8 @@
 
 Generate icons in any color for [APatch](https://github.com/bmax121/APatch). Pick a preset palette or set a custom color, preview in real time, and export a 512×512 PNG with one click.
 
+![Screenshot](README.png)
+
 ![Astro](https://img.shields.io/badge/Astro-6.x-FF5D01?logo=astro&logoColor=white)
 ![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-v4-06B6D4?logo=tailwindcss&logoColor=white)
 

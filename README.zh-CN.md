@@ -6,6 +6,8 @@
 
 为 [APatch](https://github.com/bmax121/APatch) 生成任意颜色的图标。选择预设配色或自定义颜色，实时预览并一键导出 512×512 PNG。
 
+![截图](README.png)
+
 ![Astro](https://img.shields.io/badge/Astro-6.x-FF5D01?logo=astro&logoColor=white)
 ![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-v4-06B6D4?logo=tailwindcss&logoColor=white)
 
