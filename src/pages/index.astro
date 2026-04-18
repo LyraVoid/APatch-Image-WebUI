@@ -1,0 +1,362 @@
+---
+import Layout from "../layouts/Layout.astro";
+import APatchIcon from "../components/APatchIcon.astro";
+import { presets } from "../components/presets.ts";
+---
+
+<Layout title="APatch Icon Generator">
+  <main class="min-h-screen flex flex-col px-4 py-8 md:py-12 lg:py-16">
+
+    <!-- Theme Toggle -->
+    <div class="fixed top-4 right-4 z-50">
+      <button
+        id="theme-toggle"
+        class="w-10 h-10 rounded-xl bg-neutral-100 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 flex items-center justify-center hover:bg-neutral-200 dark:hover:bg-neutral-700 transition-colors duration-150 cursor-pointer"
+        title="Toggle theme"
+      >
+        <svg id="icon-sun" class="w-5 h-5 text-gray-600 dark:text-gray-300 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/>
+        </svg>
+        <svg id="icon-moon" class="w-5 h-5 text-gray-600 dark:text-gray-300 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/>
+        </svg>
+      </button>
+    </div>
+
+    <!-- Header -->
+    <header class="text-center mb-8 md:mb-10 lg:mb-12">
+      <h1 class="text-2xl md:text-3xl lg:text-4xl font-bold tracking-tight text-gray-900 dark:text-gray-50 mb-2">
+        APatch Icon Generator
+      </h1>
+      <p class="text-xs md:text-sm text-gray-500 dark:text-gray-400">
+        Generate multi-color APatch icons for your device
+      </p>
+    </header>
+
+    <!-- Main Content -->
+    <div class="w-full max-w-4xl mx-auto flex flex-col lg:flex-row gap-6 md:gap-8 lg:gap-12">
+
+      <!-- Left: Preview -->
+      <section class="w-full lg:w-1/2 lg:max-w-md">
+        <div
+          class="relative w-full max-w-xs mx-auto md:max-w-sm lg:max-w-none aspect-square rounded-2xl border border-neutral-200 dark:border-neutral-700 overflow-hidden flex items-center justify-center shadow-sm transition-colors duration-200"
+          id="preview-container"
+          style="background-color: #f5f5f5;"
+        >
+          <div id="icon-wrapper" class="transition-all duration-200 ease-out w-[97%] h-[97%]">
+            <APatchIcon id="apatch-icon" color="#3ddc84" />
+          </div>
+        </div>
+
+        <!-- Current Color Display -->
+        <div class="flex items-center justify-center gap-3 mt-4">
+          <span
+            id="color-swatch"
+            class="w-5 h-5 md:w-6 md:h-6 rounded-full border border-neutral-300 dark:border-neutral-600 transition-colors duration-200"
+            style="background-color: #3ddc84;"
+          ></span>
+          <code id="color-code" class="text-sm font-mono text-gray-600 dark:text-gray-400">#3ddc84</code>
+          <button
+            id="copy-btn"
+            class="ml-1 p-1.5 rounded-lg hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors duration-150 group"
+            title="Copy color code"
+          >
+            <svg class="w-4 h-4 text-gray-400 group-hover:text-gray-700 dark:group-hover:text-gray-200 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+            </svg>
+          </button>
+        </div>
+      </section>
+
+      <!-- Right: Controls -->
+      <section class="w-full lg:w-1/2 lg:max-w-md flex flex-col gap-6 lg:gap-8">
+
+        <!-- Preset Colors -->
+        <div>
+          <h2 class="text-xs font-semibold uppercase tracking-widest text-gray-400 dark:text-gray-500 mb-4 px-1">
+            Preset Colors
+          </h2>
+          <div class="grid grid-cols-8 gap-2 pt-6 pb-6" id="preset-grid">
+            {presets.map((preset, i) => {
+              const isBottomRow = i >= 8;
+              return (
+                <button
+                  data-color={preset.color}
+                  data-name={preset.name}
+                  class="preset-btn group relative aspect-square rounded-xl border-2 border-transparent hover:border-gray-300 dark:hover:border-gray-500 hover:scale-110 transition-all duration-150 cursor-pointer focus:outline-none focus:border-gray-400 dark:focus:border-gray-400 focus:ring-2 focus:ring-gray-100 dark:focus:ring-gray-700 active:scale-95"
+                  style={`background-color: ${preset.color};`}
+                  title={preset.name}
+                >
+                  <span class:list={[
+                    "absolute left-1/2 -translate-x-1/2 text-[10px] text-gray-500 dark:text-gray-400 whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-150 pointer-events-none z-10",
+                    isBottomRow ? "-bottom-7" : "-top-6"
+                  ]}>
+                    {preset.name}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        <!-- Custom Color -->
+        <div>
+          <h2 class="text-xs font-semibold uppercase tracking-widest text-gray-400 dark:text-gray-500 mb-4 px-1">
+            Custom Color
+          </h2>
+          <div class="flex items-center gap-3">
+            <label
+              class="relative w-12 h-12 rounded-xl cursor-pointer hover:scale-105 transition-transform duration-150 overflow-hidden border border-neutral-200 dark:border-neutral-700 shrink-0"
+              for="color-input"
+            >
+              <input
+                type="color"
+                id="color-input"
+                value="#3ddc84"
+                class="absolute inset-0 w-full h-full cursor-pointer opacity-0"
+              />
+              <div
+                id="custom-preview"
+                class="w-full h-full pointer-events-none transition-colors duration-200"
+                style="background-color: #3ddc84;"
+              ></div>
+            </label>
+            <input
+              type="text"
+              id="hex-input"
+              value="#3ddc84"
+              maxlength="7"
+              placeholder="#000000"
+              class="flex-1 h-12 px-4 rounded-xl border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 text-sm font-mono text-gray-800 dark:text-gray-200 placeholder:text-gray-300 dark:placeholder:text-gray-600 focus:outline-none focus:border-gray-400 dark:focus:border-gray-500 focus:ring-1 focus:ring-gray-100 dark:focus:ring-gray-700 transition-all duration-150"
+            />
+          </div>
+        </div>
+
+        <!-- Background Option -->
+        <div>
+          <h2 class="text-xs font-semibold uppercase tracking-widest text-gray-400 dark:text-gray-500 mb-4 px-1">
+            Export Options
+          </h2>
+          <label class="flex items-center gap-3 cursor-pointer select-none group" id="bg-toggle-label">
+            <div class="relative">
+              <input type="checkbox" id="bg-toggle" class="sr-only peer" />
+              <div class="w-11 h-6 bg-neutral-200 dark:bg-neutral-700 rounded-full peer-checked:bg-gray-900 dark:peer-checked:bg-white transition-colors duration-200"></div>
+              <div class="absolute top-0.5 left-0.5 w-5 h-5 bg-white dark:bg-neutral-900 rounded-full shadow-sm peer-checked:translate-x-5 transition-transform duration-200"></div>
+            </div>
+            <span class="text-sm text-gray-700 dark:text-gray-300 group-hover:text-gray-900 dark:group-hover:text-white transition-colors">
+              Colored Background
+            </span>
+            <span class="text-xs text-gray-400 dark:text-gray-500">Adaptive icon style</span>
+          </label>
+        </div>
+
+        <!-- Download Button -->
+        <div>
+          <button
+            id="download-btn"
+            class="w-full h-12 bg-gray-900 dark:bg-white text-white dark:text-gray-900 rounded-xl text-sm font-semibold tracking-wide hover:bg-gray-800 dark:hover:bg-gray-100 active:bg-gray-950 dark:active:bg-gray-200 transition-all duration-150 flex items-center justify-center gap-2.5 cursor-pointer focus:outline-none focus:ring-2 focus:ring-gray-300 dark:focus:ring-gray-600 focus:ring-offset-2 dark:focus:ring-offset-neutral-950"
+          >
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+            </svg>
+            Download PNG (512x512)
+          </button>
+        </div>
+      </section>
+    </div>
+
+    <!-- Footer -->
+    <footer class="mt-auto pt-8 text-center">
+      <p class="text-xs text-gray-400 dark:text-gray-500">
+        &copy; Matsuzaka Yuki &middot;
+        <a
+          href="https://github.com/matsuzaka-yuki"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="underline underline-offset-2 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
+        >GitHub</a>
+        &middot; Based on
+        <a
+          href="https://github.com/LyraVoid/APatch-Image-WebUI"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="underline underline-offset-2 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
+        >APatch-Image-WebUI</a>
+      </p>
+    </footer>
+  </main>
+</Layout>
+
+<script define:vars={{ presets }}>
+  const icon = document.getElementById("apatch-icon");
+  const colorSwatch = document.getElementById("color-swatch");
+  const colorCode = document.getElementById("color-code");
+  const copyBtn = document.getElementById("copy-btn");
+  const presetGrid = document.getElementById("preset-grid");
+  const colorInput = document.getElementById("color-input");
+  const hexInput = document.getElementById("hex-input");
+  const customPreview = document.getElementById("custom-preview");
+  const downloadBtn = document.getElementById("download-btn");
+  const bgToggle = document.getElementById("bg-toggle");
+  const previewContainer = document.getElementById("preview-container");
+  const themeToggle = document.getElementById("theme-toggle");
+  const iconSun = document.getElementById("icon-sun");
+  const iconMoon = document.getElementById("icon-moon");
+
+  let currentColor = "#3ddc84";
+  let bgEnabled = false;
+
+  function isDark() {
+    return document.documentElement.classList.contains("dark");
+  }
+
+  function updateThemeIcon() {
+    if (isDark()) {
+      iconSun.classList.remove("hidden");
+      iconMoon.classList.add("hidden");
+    } else {
+      iconSun.classList.add("hidden");
+      iconMoon.classList.remove("hidden");
+    }
+  }
+
+  themeToggle.addEventListener("click", () => {
+    document.documentElement.classList.toggle("dark");
+    localStorage.setItem("theme", isDark() ? "dark" : "light");
+    updateThemeIcon();
+    updatePreviewBg();
+  });
+
+  updateThemeIcon();
+
+  function darkenColor(hex, amount) {
+    let r = parseInt(hex.slice(1,3), 16);
+    let g = parseInt(hex.slice(3,5), 16);
+    let b = parseInt(hex.slice(5,7), 16);
+    r = Math.round(r * (1 - amount));
+    g = Math.round(g * (1 - amount));
+    b = Math.round(b * (1 - amount));
+    return `#${r.toString(16).padStart(2,'0')}${g.toString(16).padStart(2,'0')}${b.toString(16).padStart(2,'0')}`;
+  }
+
+  function isValidHex(hex) {
+    return /^#[0-9A-Fa-f]{6}$/.test(hex);
+  }
+
+  function updateColor(color) {
+    if (!isValidHex(color)) return;
+    currentColor = color.toLowerCase();
+
+    const paths = icon.querySelectorAll('path');
+    paths.forEach(p => p.setAttribute('fill', currentColor));
+
+    colorSwatch.style.backgroundColor = currentColor;
+    colorCode.textContent = currentColor;
+    customPreview.style.backgroundColor = currentColor;
+
+    document.querySelectorAll(".preset-btn").forEach(btn => {
+      if (btn.dataset.color.toLowerCase() === currentColor) {
+        btn.classList.add("border-gray-400", "scale-105", "ring-2", "ring-gray-100");
+      } else {
+        btn.classList.remove("border-gray-400", "scale-105", "ring-2", "ring-gray-100");
+      }
+    });
+
+    updatePreviewBg();
+  }
+
+  function updatePreviewBg() {
+    if (bgEnabled) {
+      previewContainer.style.backgroundColor = darkenColor(currentColor, 0.82);
+    } else {
+      previewContainer.style.backgroundColor = isDark() ? '#1a1a1a' : '#f5f5f5';
+    }
+  }
+
+  bgToggle.addEventListener("change", () => {
+    bgEnabled = bgToggle.checked;
+    updatePreviewBg();
+  });
+
+  presetGrid.addEventListener("click", (e) => {
+    const btn = e.target.closest(".preset-btn");
+    if (!btn) return;
+    const color = btn.dataset.color;
+    colorInput.value = color;
+    hexInput.value = color;
+    updateColor(color);
+  });
+
+  colorInput.addEventListener("input", (e) => {
+    const color = e.target.value;
+    hexInput.value = color;
+    updateColor(color);
+  });
+
+  hexInput.addEventListener("input", (e) => {
+    let val = e.target.value.trim();
+    if (!val.startsWith("#")) val = "#" + val;
+    if (isValidHex(val)) {
+      colorInput.value = val;
+      updateColor(val);
+    }
+  });
+
+  hexInput.addEventListener("blur", (e) => {
+    let val = e.target.value.trim();
+    if (!val.startsWith("#")) val = "#" + val;
+    if (isValidHex(val)) {
+      updateColor(val);
+    } else {
+      e.target.value = currentColor;
+    }
+  });
+
+  copyBtn.addEventListener("click", () => {
+    navigator.clipboard.writeText(currentColor).then(() => {
+      const originalHTML = copyBtn.innerHTML;
+      copyBtn.innerHTML = `<svg class="w-4 h-4 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>`;
+      setTimeout(() => { copyBtn.innerHTML = originalHTML; }, 1200);
+    });
+  });
+
+  downloadBtn.addEventListener("click", () => {
+    const svgEl = icon.cloneNode(true);
+    svgEl.removeAttribute("class");
+    svgEl.removeAttribute("id");
+    svgEl.removeAttribute("data-icon");
+    svgEl.setAttribute("width", "512");
+    svgEl.setAttribute("height", "512");
+    svgEl.setAttribute("viewBox", "0 0 512 512");
+    svgEl.setAttribute("xmlns", "http://www.w3.org/2000/svg");
+
+    const svgData = new XMLSerializer().serializeToString(svgEl);
+    const svgBlob = new Blob([svgData], { type: "image/svg+xml;charset=utf-8" });
+    const url = URL.createObjectURL(svgBlob);
+
+    const img = new Image();
+    img.onload = () => {
+      const canvas = document.createElement("canvas");
+      canvas.width = 512;
+      canvas.height = 512;
+      const ctx = canvas.getContext("2d");
+
+      if (bgEnabled) {
+        ctx.fillStyle = darkenColor(currentColor, 0.82);
+        ctx.fillRect(0, 0, 512, 512);
+      }
+
+      ctx.drawImage(img, 0, 0, 512, 512);
+      URL.revokeObjectURL(url);
+
+      const pngUrl = canvas.toDataURL("image/png");
+      const link = document.createElement("a");
+      link.download = `apatch-icon-${currentColor.replace("#", "")}${bgEnabled ? "-bg" : ""}.png`;
+      link.href = pngUrl;
+      link.click();
+    };
+    img.src = url;
+  });
+
+  updateColor(currentColor);
+</script>

@@ -1,0 +1,18 @@
+export const presets = [
+  { name: "APatch Green", color: "#3ddc84" },
+  { name: "Material Red", color: "#F44336" },
+  { name: "Material Blue", color: "#2196F3" },
+  { name: "Material Purple", color: "#9C27B0" },
+  { name: "Material Orange", color: "#FF9800" },
+  { name: "Material Teal", color: "#009688" },
+  { name: "Material Pink", color: "#E91E63" },
+  { name: "Material Indigo", color: "#3F51B5" },
+  { name: "Material Cyan", color: "#00BCD4" },
+  { name: "Material Amber", color: "#FFC107" },
+  { name: "Deep Green", color: "#237c4b" },
+  { name: "Lime", color: "#CDDC39" },
+  { name: "Deep Purple", color: "#673AB7" },
+  { name: "Light Blue", color: "#03A9F4" },
+  { name: "Coral", color: "#FF7043" },
+  { name: "Brown", color: "#795548" },
+];
