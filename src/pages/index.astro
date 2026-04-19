@@ -1,7 +1,7 @@
 ---
 import Layout from "../layouts/Layout.astro";
 import APatchIcon from "../components/APatchIcon.astro";
-import { presets } from "../components/presets.ts";
+import { presets, gradientTemplates, gradientPresets } from "../components/presets.ts";
 import { locales, defaultLocale, translations as i18nStrings } from "../i18n/translations.ts";
 ---
 
@@ -158,7 +158,7 @@ import { locales, defaultLocale, translations as i18nStrings } from "../i18n/tra
         </div>
 
         <!-- Current Color Display -->
-        <div class="flex items-center justify-center gap-3 mt-3">
+        <div id="solid-color-display" class="flex items-center justify-center gap-3 mt-3">
           <span
             id="color-swatch"
             class="w-5 h-5 md:w-6 md:h-6 rounded-full border border-neutral-300 dark:border-neutral-600 transition-colors duration-200"
@@ -176,72 +176,174 @@ import { locales, defaultLocale, translations as i18nStrings } from "../i18n/tra
             </svg>
           </button>
         </div>
+
+        <!-- Gradient preview bar (gradient mode only) -->
+        <div id="gradient-color-display" class="hidden mt-3 flex items-center justify-center gap-2">
+          <div id="gradient-preview-bar" class="h-6 flex-1 max-w-64 rounded-lg border border-neutral-200 dark:border-neutral-600" style="background: linear-gradient(to right, #FF6B35, #FFC145);"></div>
+        </div>
       </section>
 
       <!-- Right: Controls -->
       <section class="w-full lg:w-1/2 lg:max-w-md flex flex-col gap-6 lg:gap-8">
 
-        <!-- Preset Colors -->
-        <div>
-          <h2 class="text-xs font-semibold uppercase tracking-widest text-gray-400 dark:text-gray-500 mb-4 px-1" data-i18n="presetColors">
-            Preset Colors
-          </h2>
-          <div class="grid grid-cols-8 gap-2 pt-6 pb-6" id="preset-grid" role="listbox" aria-label="Preset color palette">
-            {presets.map((preset, i) => {
-              const isBottomRow = i >= 8;
-              return (
-                <button
-                  data-color={preset.color}
-                  data-name={preset.name}
-                  class="preset-btn group relative aspect-square rounded-xl border-2 border-transparent hover:border-gray-300 dark:hover:border-gray-500 hover:scale-110 transition-all duration-150 cursor-pointer focus:outline-none focus:border-gray-400 dark:focus:border-gray-400 focus:ring-2 focus:ring-gray-100 dark:focus:ring-gray-700 active:scale-95"
-                  style={`background-color: ${preset.color};`}
-                  title={preset.name}
-                  aria-label={`Use ${preset.name} preset`}
-                  role="option"
-                >
-                  <span class:list={[
-                    "absolute left-1/2 -translate-x-1/2 text-[10px] text-gray-500 dark:text-gray-400 whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-150 pointer-events-none z-10",
-                    isBottomRow ? "-bottom-7" : "-top-6"
-                  ]}>
-                    {preset.name}
-                  </span>
-                </button>
-              );
-            })}
+        <!-- Mode Toggle -->
+        <div class="flex rounded-xl bg-neutral-100 dark:bg-neutral-800 p-1 border border-neutral-200 dark:border-neutral-700">
+          <button
+            id="mode-solid-btn"
+            class="flex-1 h-9 text-sm font-medium rounded-lg transition-all duration-150 cursor-pointer bg-white dark:bg-neutral-700 text-gray-900 dark:text-gray-100 shadow-sm"
+            data-mode="solid"
+          >
+            <span data-i18n="modeSolid">Solid</span>
+          </button>
+          <button
+            id="mode-gradient-btn"
+            class="flex-1 h-9 text-sm font-medium rounded-lg transition-all duration-150 cursor-pointer text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200"
+            data-mode="gradient"
+          >
+            <span data-i18n="modeGradient">Gradient</span>
+          </button>
+        </div>
+
+        <!-- ===== SOLID MODE PANEL ===== -->
+        <div id="solid-panel">
+
+          <!-- Preset Colors -->
+          <div>
+            <h2 class="text-xs font-semibold uppercase tracking-widest text-gray-400 dark:text-gray-500 mb-4 px-1" data-i18n="presetColors">
+              Preset Colors
+            </h2>
+            <div class="grid grid-cols-8 gap-2 pt-6 pb-6" id="preset-grid" role="listbox" aria-label="Preset color palette">
+              {presets.map((preset, i) => {
+                const isBottomRow = i >= 8;
+                return (
+                  <button
+                    data-color={preset.color}
+                    data-name={preset.name}
+                    class="preset-btn group relative aspect-square rounded-xl border-2 border-transparent hover:border-gray-300 dark:hover:border-gray-500 hover:scale-110 transition-all duration-150 cursor-pointer focus:outline-none focus:border-gray-400 dark:focus:border-gray-400 focus:ring-2 focus:ring-gray-100 dark:focus:ring-gray-700 active:scale-95"
+                    style={`background-color: ${preset.color};`}
+                    title={preset.name}
+                    aria-label={`Use ${preset.name} preset`}
+                    role="option"
+                  >
+                    <span class:list={[
+                      "absolute left-1/2 -translate-x-1/2 text-[10px] text-gray-500 dark:text-gray-400 whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-150 pointer-events-none z-10",
+                      isBottomRow ? "-bottom-7" : "-top-6"
+                    ]}>
+                      {preset.name}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          <!-- Custom Color -->
+          <div>
+            <h2 class="text-xs font-semibold uppercase tracking-widest text-gray-400 dark:text-gray-500 mb-4 px-1" data-i18n="customColor">
+              Custom Color
+            </h2>
+            <div class="flex items-center gap-3">
+              <label
+                class="relative w-12 h-12 rounded-xl cursor-pointer hover:scale-105 transition-transform duration-150 overflow-hidden border border-neutral-200 dark:border-neutral-700 shrink-0"
+                for="color-input"
+              >
+                <input
+                  type="color"
+                  id="color-input"
+                  value="#3ddc84"
+                  class="absolute inset-0 w-full h-full cursor-pointer opacity-0"
+                />
+                <div
+                  id="custom-preview"
+                  class="w-full h-full pointer-events-none transition-colors duration-200"
+                  style="background-color: #3ddc84;"
+                ></div>
+              </label>
+              <input
+                type="text"
+                id="hex-input"
+                value="#3ddc84"
+                maxlength="7"
+                placeholder="#000000"
+                aria-label="Custom hex color"
+                class="flex-1 h-12 px-4 rounded-xl border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 text-sm font-mono text-gray-800 dark:text-gray-200 placeholder:text-gray-300 dark:placeholder:text-gray-600 focus:outline-none focus:border-gray-400 dark:focus:border-gray-500 focus:ring-1 focus:ring-gray-100 dark:focus:ring-gray-700 transition-all duration-150"
+              />
+            </div>
           </div>
         </div>
 
-        <!-- Custom Color -->
-        <div>
-          <h2 class="text-xs font-semibold uppercase tracking-widest text-gray-400 dark:text-gray-500 mb-4 px-1" data-i18n="customColor">
-            Custom Color
-          </h2>
-          <div class="flex items-center gap-3">
-            <label
-              class="relative w-12 h-12 rounded-xl cursor-pointer hover:scale-105 transition-transform duration-150 overflow-hidden border border-neutral-200 dark:border-neutral-700 shrink-0"
-              for="color-input"
-            >
-              <input
-                type="color"
-                id="color-input"
-                value="#3ddc84"
-                class="absolute inset-0 w-full h-full cursor-pointer opacity-0"
-              />
-              <div
-                id="custom-preview"
-                class="w-full h-full pointer-events-none transition-colors duration-200"
-                style="background-color: #3ddc84;"
-              ></div>
-            </label>
-            <input
-              type="text"
-              id="hex-input"
-              value="#3ddc84"
-              maxlength="7"
-              placeholder="#000000"
-              aria-label="Custom hex color"
-              class="flex-1 h-12 px-4 rounded-xl border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 text-sm font-mono text-gray-800 dark:text-gray-200 placeholder:text-gray-300 dark:placeholder:text-gray-600 focus:outline-none focus:border-gray-400 dark:focus:border-gray-500 focus:ring-1 focus:ring-gray-100 dark:focus:ring-gray-700 transition-all duration-150"
-            />
+        <!-- ===== GRADIENT MODE PANEL ===== -->
+        <div id="gradient-panel" class="hidden">
+
+          <!-- Gradient Templates -->
+          <div>
+            <h2 class="text-xs font-semibold uppercase tracking-widest text-gray-400 dark:text-gray-500 mb-4 px-1" data-i18n="gradientTemplates">
+              Gradient Template
+            </h2>
+            <div class="grid grid-cols-3 sm:grid-cols-6 gap-2" id="template-grid" role="listbox" aria-label="Gradient template selector">
+              {gradientTemplates.map((tpl) => {
+                const isLinear = tpl.type === "linear";
+                const gradDir = isLinear
+                  ? `linear-gradient(${tpl.id === "horizontal" ? "to right" : tpl.id === "vertical" ? "to bottom" : tpl.id === "diagonal" ? "to bottom right" : "to bottom left"}, #FF6B35, #FFC145)`
+                  : `radial-gradient(circle at ${tpl.attrs.cx ?? "50%"} ${tpl.attrs.cy ?? "50%"}, #FF6B35, #FFC145)`;
+                return (
+                  <button
+                    data-template={tpl.id}
+                    class="tpl-btn group relative aspect-[2/1] rounded-xl border-2 border-transparent hover:border-gray-300 dark:hover:border-gray-500 transition-all duration-150 cursor-pointer focus:outline-none focus:border-gray-400 dark:focus:border-gray-400 active:scale-95 overflow-hidden"
+                    style={`background: ${gradDir};`}
+                    title={tpl.name}
+                    aria-label={tpl.name}
+                    role="option"
+                  >
+                    <span class="absolute inset-x-0 bottom-0 text-[9px] text-white/80 text-center pb-0.5 drop-shadow-sm pointer-events-none truncate px-1" data-i18n-tpl={tpl.id}></span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          <!-- Gradient Colors -->
+          <div class="mt-6">
+            <div class="flex items-center justify-between mb-4 px-1">
+              <h2 class="text-xs font-semibold uppercase tracking-widest text-gray-400 dark:text-gray-500" data-i18n="gradientColors">
+                Gradient Colors
+              </h2>
+              <button
+                id="add-color-btn"
+                class="text-xs font-medium text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors cursor-pointer flex items-center gap-1"
+                aria-label="Add color stop"
+              >
+                <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
+                </svg>
+                <span data-i18n="addColor">Add Color</span>
+              </button>
+            </div>
+            <div id="color-stops" class="space-y-2">
+              <!-- Dynamically populated by JS -->
+            </div>
+          </div>
+
+          <!-- Gradient Presets -->
+          <div class="mt-6">
+            <h2 class="text-xs font-semibold uppercase tracking-widest text-gray-400 dark:text-gray-500 mb-4 px-1" data-i18n="gradientPresets">
+              Gradient Presets
+            </h2>
+            <div class="grid grid-cols-5 gap-2" id="gradient-preset-grid" role="listbox" aria-label="Gradient preset palette">
+              {gradientPresets.map((gp) => (
+                <button
+                  data-gcolors={gp.colors.join(",")}
+                  data-gname={gp.name}
+                  class="gpreset-btn group relative aspect-[2/1] rounded-xl border-2 border-transparent hover:border-gray-300 dark:hover:border-gray-500 hover:scale-105 transition-all duration-150 cursor-pointer focus:outline-none focus:border-gray-400 dark:focus:border-gray-400 active:scale-95 overflow-hidden"
+                  style={`background: linear-gradient(to right, ${gp.colors[0]}, ${gp.colors[1]});`}
+                  title={gp.name}
+                  aria-label={gp.name}
+                  role="option"
+                >
+                  <span class="absolute inset-x-0 bottom-0 text-[9px] text-white/80 text-center pb-0.5 drop-shadow-sm pointer-events-none truncate px-1">{gp.name}</span>
+                </button>
+              ))}
+            </div>
           </div>
         </div>
 
@@ -261,6 +363,23 @@ import { locales, defaultLocale, translations as i18nStrings } from "../i18n/tra
             </span>
             <span class="text-xs text-gray-400 dark:text-gray-500 hidden sm:inline" data-i18n="adaptiveIconStyle">Adaptive icon style</span>
           </label>
+          <div id="bg-options" class="hidden mt-3 ml-14 space-y-2.5">
+            <div class="flex rounded-lg bg-neutral-100 dark:bg-neutral-800 p-0.5 border border-neutral-200 dark:border-neutral-700 w-fit">
+              <button id="bg-solid-btn" class="bg-style-btn flex-1 h-7 px-3 text-xs font-medium rounded-md transition-all duration-150 cursor-pointer bg-white dark:bg-neutral-700 text-gray-900 dark:text-gray-100 shadow-sm" data-bgstyle="solid">
+                <span data-i18n="modeSolid">Solid</span>
+              </button>
+              <button id="bg-gradient-btn" class="bg-style-btn flex-1 h-7 px-3 text-xs font-medium rounded-md transition-all duration-150 cursor-pointer text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200" data-bgstyle="gradient">
+                <span data-i18n="modeGradient">Gradient</span>
+              </button>
+            </div>
+            <div id="bg-solid-picker" class="flex items-center gap-2">
+              <label class="relative w-8 h-8 rounded-lg cursor-pointer overflow-hidden border border-neutral-200 dark:border-neutral-700 shrink-0">
+                <input type="color" id="bg-color-input" value="#2e130a" class="absolute inset-0 w-full h-full cursor-pointer opacity-0" aria-label="Background color" />
+                <div id="bg-color-swatch" class="w-full h-full pointer-events-none transition-colors duration-200" style="background-color: #2e130a;"></div>
+              </label>
+              <input type="text" id="bg-hex-input" value="#2e130a" maxlength="7" class="flex-1 h-8 px-2 rounded-lg border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 text-xs font-mono text-gray-800 dark:text-gray-200 focus:outline-none focus:border-gray-400 dark:focus:border-gray-500" aria-label="Background hex color" />
+            </div>
+          </div>
         </div>
 
         <!-- Export Size -->
@@ -355,7 +474,7 @@ import { locales, defaultLocale, translations as i18nStrings } from "../i18n/tra
   </main>
 </Layout>
 
-<script define:vars={{ presets, translations: i18nStrings }}>
+<script define:vars={{ presets, gradientTemplates, gradientPresets, translations: i18nStrings }}>
 
   const supportedLocales = ["en", "zh-CN", "ja", "zh-TW"];
   let currentLocale = localStorage.getItem("locale") || "en";
@@ -381,6 +500,19 @@ import { locales, defaultLocale, translations as i18nStrings } from "../i18n/tra
     document.querySelectorAll("[data-i18n-html]").forEach((el) => {
       const key = el.getAttribute("data-i18n-html");
       el.innerHTML = tr(key);
+    });
+    const tplI18nMap = {
+      horizontal: "tplHorizontal",
+      vertical: "tplVertical",
+      diagonal: "tplDiagonal",
+      "diagonal-reverse": "tplDiagonalReverse",
+      "radial-center": "tplRadialCenter",
+      "radial-top": "tplRadialTop",
+    };
+    document.querySelectorAll("[data-i18n-tpl]").forEach((el) => {
+      const tplId = el.getAttribute("data-i18n-tpl");
+      const i18nKey = tplI18nMap[tplId];
+      if (i18nKey) el.textContent = tr(i18nKey);
     });
     const langMap = { "zh-CN": "zh-CN", "zh-TW": "zh-TW", "ja": "ja", "en": "en" };
     document.documentElement.lang = langMap[currentLocale] || "en";
@@ -410,7 +542,7 @@ import { locales, defaultLocale, translations as i18nStrings } from "../i18n/tra
     });
   }
 
-  // === Mobile menu (single button for theme + language) ===
+  // === Mobile menu ===
   const mobileMenuBtn = document.getElementById("mobile-menu-btn");
   const mobileMenuPanel = document.getElementById("mobile-menu-panel");
   const mobileThemeBtn = document.getElementById("mobile-theme-btn");
@@ -444,7 +576,6 @@ import { locales, defaultLocale, translations as i18nStrings } from "../i18n/tra
     });
   }
 
-  // Close mobile menu on outside click
   document.addEventListener("click", (e) => {
     const wrapper = document.getElementById("mobile-menu-wrapper");
     if (wrapper && !wrapper.contains(e.target)) closeMobileMenu();
@@ -484,6 +615,7 @@ import { locales, defaultLocale, translations as i18nStrings } from "../i18n/tra
   applyTranslations();
   updateLangCheckmarks();
 
+  // === Core refs ===
   const icon = document.getElementById("apatch-icon");
   const colorSwatch = document.getElementById("color-swatch");
   const colorCode = document.getElementById("color-code");
@@ -506,12 +638,40 @@ import { locales, defaultLocale, translations as i18nStrings } from "../i18n/tra
   const statusMessage = document.getElementById("status-message");
   const previewScaleRange = document.getElementById("preview-scale-range");
   const previewScaleDisplay = document.getElementById("preview-scale-display");
+  const solidPanel = document.getElementById("solid-panel");
+  const gradientPanel = document.getElementById("gradient-panel");
+  const modeSolidBtn = document.getElementById("mode-solid-btn");
+  const modeGradientBtn = document.getElementById("mode-gradient-btn");
+  const templateGrid = document.getElementById("template-grid");
+  const colorStopsContainer = document.getElementById("color-stops");
+  const addColorBtn = document.getElementById("add-color-btn");
+  const gradientPresetGrid = document.getElementById("gradient-preset-grid");
+  const gradientPreviewBar = document.getElementById("gradient-preview-bar");
+  const solidColorDisplay = document.getElementById("solid-color-display");
+  const gradientColorDisplay = document.getElementById("gradient-color-display");
 
+  // === State ===
   let currentColor = "#3ddc84";
   let bgEnabled = false;
   let exportSize = 512;
   let previewScale = 1.0;
+  let currentMode = "solid";
+  let gradientColors = ["#FF6B35", "#FFC145"];
+  let currentTemplateId = "horizontal";
+  let bgStyle = "solid";
+  let bgCustomColor = "#2e130a";
 
+  // === Gradient template SVG params ===
+  const tplDefs = {
+    horizontal:         { type: "linearGradient",  attrs: { x1: "0%", y1: "50%", x2: "100%", y2: "50%" } },
+    vertical:           { type: "linearGradient",  attrs: { x1: "50%", y1: "0%", x2: "50%", y2: "100%" } },
+    diagonal:           { type: "linearGradient",  attrs: { x1: "0%", y1: "0%", x2: "100%", y2: "100%" } },
+    "diagonal-reverse": { type: "linearGradient",  attrs: { x1: "100%", y1: "0%", x2: "0%", y2: "100%" } },
+    "radial-center":    { type: "radialGradient",  attrs: { cx: "50%", cy: "50%", r: "50%", fx: "50%", fy: "50%" } },
+    "radial-top":       { type: "radialGradient",  attrs: { cx: "50%", cy: "0%", r: "70%", fx: "50%", fy: "0%" } },
+  };
+
+  // === Utility ===
   function setStatus(message, isError = false) {
     if (!statusMessage) return;
     statusMessage.textContent = message;
@@ -529,7 +689,6 @@ import { locales, defaultLocale, translations as i18nStrings } from "../i18n/tra
     const showSun = isDark();
     if (iconSun) iconSun.classList.toggle("hidden", !showSun);
     if (iconMoon) iconMoon.classList.toggle("hidden", showSun);
-    // Mobile icons
     const mSun = document.getElementById("mobile-icon-sun");
     const mMoon = document.getElementById("mobile-icon-moon");
     if (mSun) mSun.classList.toggle("hidden", !showSun);
@@ -555,6 +714,46 @@ import { locales, defaultLocale, translations as i18nStrings } from "../i18n/tra
     g = Math.round(g * (1 - amount));
     b = Math.round(b * (1 - amount));
     return `#${r.toString(16).padStart(2,'0')}${g.toString(16).padStart(2,'0')}${b.toString(16).padStart(2,'0')}`;
+  }
+
+  function getCssGradient(colors, templateId) {
+    const tpl = tplDefs[templateId];
+    const colorStr = colors.join(", ");
+    if (tpl.type === "radialGradient") {
+      return `radial-gradient(circle at ${tpl.attrs.cx} ${tpl.attrs.cy}, ${colorStr})`;
+    }
+    const dirMap = {
+      horizontal: "to right",
+      vertical: "to bottom",
+      diagonal: "to bottom right",
+      "diagonal-reverse": "to bottom left",
+    };
+    return `linear-gradient(${dirMap[templateId] || "to right"}, ${colorStr})`;
+  }
+
+  function createCanvasGradient(ctx, size, colors, templateId) {
+    const tpl = tplDefs[templateId];
+    let grad;
+    if (tpl.type === "linearGradient") {
+      const coords = {
+        horizontal: [0, size/2, size, size/2],
+        vertical: [size/2, 0, size/2, size],
+        diagonal: [0, 0, size, size],
+        "diagonal-reverse": [size, 0, 0, size],
+      };
+      const [x1, y1, x2, y2] = coords[templateId] || coords.horizontal;
+      grad = ctx.createLinearGradient(x1, y1, x2, y2);
+    } else {
+      const cx = parseFloat(tpl.attrs.cx) / 100 * size;
+      const cy = parseFloat(tpl.attrs.cy) / 100 * size;
+      const r = parseFloat(tpl.attrs.r) / 100 * size;
+      grad = ctx.createRadialGradient(cx, cy, 0, cx, cy, r);
+    }
+    colors.forEach((c, i) => {
+      const pct = colors.length === 1 ? 0 : i / (colors.length - 1);
+      grad.addColorStop(pct, c);
+    });
+    return grad;
   }
 
   function isValidHex(hex) {
@@ -597,18 +796,21 @@ import { locales, defaultLocale, translations as i18nStrings } from "../i18n/tra
     colorInput.value = color;
     hexInput.value = color;
     updateColor(color);
-
-    if (shouldFocus) {
-      btn.focus();
-    }
+    if (shouldFocus) btn.focus();
   }
 
+  // ==============================
+  // SOLID MODE
+  // ==============================
   function updateColor(color) {
     if (!isValidHex(color)) return;
     currentColor = color.toLowerCase();
 
-    const paths = icon.querySelectorAll('path');
-    paths.forEach(p => p.setAttribute('fill', currentColor));
+    if (currentMode === "solid") {
+      applySvgGradient(null);
+      const paths = icon.querySelectorAll('path');
+      paths.forEach(p => p.setAttribute('fill', currentColor));
+    }
 
     colorSwatch.style.backgroundColor = currentColor;
     colorCode.textContent = currentColor;
@@ -629,9 +831,265 @@ import { locales, defaultLocale, translations as i18nStrings } from "../i18n/tra
     updatePreviewBg();
   }
 
+  // ==============================
+  // GRADIENT MODE
+  // ==============================
+  function buildGradientDefs() {
+    const tpl = tplDefs[currentTemplateId];
+    if (!tpl) return;
+
+    const ns = "http://www.w3.org/2000/svg";
+    const existingDefs = icon.querySelector("defs");
+    if (existingDefs) existingDefs.remove();
+
+    const defs = document.createElementNS(ns, "defs");
+    const gradEl = document.createElementNS(ns, tpl.type);
+    gradEl.setAttribute("id", "apatch-grad");
+    gradEl.setAttribute("gradientUnits", "userSpaceOnUse");
+
+    for (const [k, v] of Object.entries(tpl.attrs)) {
+      gradEl.setAttribute(k, v);
+    }
+
+    gradientColors.forEach((c, i) => {
+      const stop = document.createElementNS(ns, "stop");
+      const pct = gradientColors.length === 1 ? 0 : Math.round((i / (gradientColors.length - 1)) * 100);
+      stop.setAttribute("offset", `${pct}%`);
+      stop.setAttribute("stop-color", c);
+      gradEl.appendChild(stop);
+    });
+
+    defs.appendChild(gradEl);
+    icon.insertBefore(defs, icon.firstChild);
+  }
+
+  function applySvgGradient(templateId) {
+    if (templateId) currentTemplateId = templateId;
+
+    if (currentMode !== "gradient") return;
+
+    buildGradientDefs();
+
+    const paths = icon.querySelectorAll('path');
+    paths.forEach(p => p.setAttribute('fill', 'url(#apatch-grad)'));
+
+    icon.setAttribute('data-mode', 'gradient');
+
+    updateGradientPreviewBar();
+  }
+
+  function applySvgSolid() {
+    const existingDefs = icon.querySelector("defs");
+    if (existingDefs) existingDefs.remove();
+
+    const paths = icon.querySelectorAll('path');
+    paths.forEach(p => p.setAttribute('fill', currentColor));
+
+    icon.setAttribute('data-mode', 'solid');
+  }
+
+  function updateGradientPreviewBar() {
+    if (!gradientPreviewBar) return;
+    gradientPreviewBar.style.background = `linear-gradient(to right, ${gradientColors.join(", ")})`;
+  }
+
+  function renderColorStops() {
+    if (!colorStopsContainer) return;
+    colorStopsContainer.innerHTML = "";
+
+    gradientColors.forEach((color, index) => {
+      const row = document.createElement("div");
+      row.className = "flex items-center gap-2";
+
+      const label = document.createElement("label");
+      label.className = "relative w-10 h-10 rounded-lg cursor-pointer hover:scale-105 transition-transform duration-150 overflow-hidden border border-neutral-200 dark:border-neutral-700 shrink-0";
+      const picker = document.createElement("input");
+      picker.type = "color";
+      picker.value = color;
+      picker.className = "absolute inset-0 w-full h-full cursor-pointer opacity-0";
+      picker.setAttribute("aria-label", `Gradient color ${index + 1}`);
+      picker.addEventListener("input", (e) => {
+        gradientColors[index] = e.target.value;
+        swatchDiv.style.backgroundColor = e.target.value;
+        hexField.value = e.target.value;
+        applySvgGradient();
+        updatePreviewBg();
+      });
+      const swatchDiv = document.createElement("div");
+      swatchDiv.className = "w-full h-full pointer-events-none transition-colors duration-200";
+      swatchDiv.style.backgroundColor = color;
+      label.appendChild(picker);
+      label.appendChild(swatchDiv);
+
+      const hexField = document.createElement("input");
+      hexField.type = "text";
+      hexField.value = color;
+      hexField.maxLength = 7;
+      hexField.className = "flex-1 h-10 px-3 rounded-lg border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 text-sm font-mono text-gray-800 dark:text-gray-200 focus:outline-none focus:border-gray-400 dark:focus:border-gray-500";
+      hexField.setAttribute("aria-label", `Gradient hex color ${index + 1}`);
+      hexField.addEventListener("input", (e) => {
+        let val = e.target.value.trim();
+        if (!val.startsWith("#")) val = "#" + val;
+        if (isValidHex(val)) {
+          gradientColors[index] = val;
+          picker.value = val;
+          swatchDiv.style.backgroundColor = val;
+          applySvgGradient();
+          updatePreviewBg();
+        }
+      });
+      hexField.addEventListener("blur", (e) => {
+        let val = e.target.value.trim();
+        if (!val.startsWith("#")) val = "#" + val;
+        if (isValidHex(val)) {
+          gradientColors[index] = val;
+          e.target.value = val;
+          applySvgGradient();
+          updatePreviewBg();
+        } else {
+          e.target.value = gradientColors[index];
+        }
+      });
+
+      row.appendChild(label);
+      row.appendChild(hexField);
+
+      if (gradientColors.length > 2) {
+        const removeBtn = document.createElement("button");
+        removeBtn.className = "w-8 h-8 flex items-center justify-center rounded-lg hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors text-gray-400 hover:text-red-500 dark:hover:text-red-400 cursor-pointer shrink-0";
+        removeBtn.setAttribute("aria-label", tr("removeColor"));
+        removeBtn.title = tr("removeColor");
+        removeBtn.innerHTML = '<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>';
+        removeBtn.addEventListener("click", () => {
+          gradientColors.splice(index, 1);
+          renderColorStops();
+          applySvgGradient();
+          updatePreviewBg();
+          updateAddColorBtn();
+        });
+        row.appendChild(removeBtn);
+      }
+
+      colorStopsContainer.appendChild(row);
+    });
+  }
+
+  function updateAddColorBtn() {
+    if (!addColorBtn) return;
+    addColorBtn.style.display = gradientColors.length >= 4 ? "none" : "flex";
+  }
+
+  // === Mode Switch ===
+  function switchMode(mode) {
+    currentMode = mode;
+
+    if (mode === "solid") {
+      solidPanel.classList.remove("hidden");
+      gradientPanel.classList.add("hidden");
+      solidColorDisplay.classList.remove("hidden");
+      gradientColorDisplay.classList.add("hidden");
+
+      modeSolidBtn.className = "flex-1 h-9 text-sm font-medium rounded-lg transition-all duration-150 cursor-pointer bg-white dark:bg-neutral-700 text-gray-900 dark:text-gray-100 shadow-sm";
+      modeGradientBtn.className = "flex-1 h-9 text-sm font-medium rounded-lg transition-all duration-150 cursor-pointer text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200";
+
+      applySvgSolid();
+      updateBgOptionsVisibility();
+      updatePreviewBg();
+    } else {
+      solidPanel.classList.add("hidden");
+      gradientPanel.classList.remove("hidden");
+      solidColorDisplay.classList.add("hidden");
+      gradientColorDisplay.classList.remove("hidden");
+      gradientColorDisplay.classList.add("flex");
+
+      modeGradientBtn.className = "flex-1 h-9 text-sm font-medium rounded-lg transition-all duration-150 cursor-pointer bg-white dark:bg-neutral-700 text-gray-900 dark:text-gray-100 shadow-sm";
+      modeSolidBtn.className = "flex-1 h-9 text-sm font-medium rounded-lg transition-all duration-150 cursor-pointer text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200";
+
+      applySvgGradient();
+      renderColorStops();
+      updateAddColorBtn();
+      updateBgOptionsVisibility();
+      updatePreviewBg();
+    }
+  }
+
+  modeSolidBtn.addEventListener("click", () => switchMode("solid"));
+  modeGradientBtn.addEventListener("click", () => switchMode("gradient"));
+
+  // === Template grid ===
+  templateGrid.addEventListener("click", (e) => {
+    const btn = e.target.closest(".tpl-btn");
+    if (!btn) return;
+    const tplId = btn.dataset.template;
+
+    document.querySelectorAll(".tpl-btn").forEach(b => {
+      b.classList.remove("border-gray-400", "ring-2", "ring-gray-100");
+      b.classList.add("border-transparent");
+    });
+    btn.classList.remove("border-transparent");
+    btn.classList.add("border-gray-400", "ring-2", "ring-gray-100");
+
+    applySvgGradient(tplId);
+    updatePreviewBg();
+  });
+
+  // Select first template by default
+  const firstTplBtn = templateGrid.querySelector(".tpl-btn");
+  if (firstTplBtn) {
+    firstTplBtn.classList.remove("border-transparent");
+    firstTplBtn.classList.add("border-gray-400", "ring-2", "ring-gray-100");
+  }
+
+  // === Gradient presets ===
+  gradientPresetGrid.addEventListener("click", (e) => {
+    const btn = e.target.closest(".gpreset-btn");
+    if (!btn) return;
+    const colors = btn.dataset.gcolors.split(",");
+
+    gradientColors = colors.slice(0, 2);
+    while (gradientColors.length < 2) gradientColors.push("#000000");
+
+    renderColorStops();
+    applySvgGradient();
+    updatePreviewBg();
+    updateAddColorBtn();
+
+    document.querySelectorAll(".gpreset-btn").forEach(b => {
+      b.classList.remove("border-gray-400", "ring-2", "ring-gray-100");
+      b.classList.add("border-transparent");
+    });
+    btn.classList.remove("border-transparent");
+    btn.classList.add("border-gray-400", "ring-2", "ring-gray-100");
+  });
+
+  // === Add color ===
+  addColorBtn.addEventListener("click", () => {
+    if (gradientColors.length >= 4) return;
+    const hues = [0, 30, 60, 120, 180, 240, 270, 300];
+    const hue = hues[gradientColors.length % hues.length];
+    const newColor = `hsl(${hue}, 70%, 55%)`;
+    const temp = document.createElement("canvas").getContext("2d");
+    temp.fillStyle = newColor;
+    const hex = temp.fillStyle;
+    gradientColors.push(hex.length === 7 ? hex : "#888888");
+    renderColorStops();
+    applySvgGradient();
+    updatePreviewBg();
+    updateAddColorBtn();
+  });
+
+  // === Shared handlers ===
   function updatePreviewBg() {
+    previewContainer.style.background = "";
     if (bgEnabled) {
-      previewContainer.style.backgroundColor = darkenColor(currentColor, 0.82);
+      if (currentMode === "gradient" && bgStyle === "gradient") {
+        const darkened = gradientColors.map(c => darkenColor(c, 0.5));
+        previewContainer.style.background = getCssGradient(darkened, currentTemplateId);
+      } else if (currentMode === "gradient") {
+        previewContainer.style.backgroundColor = bgCustomColor;
+      } else {
+        previewContainer.style.backgroundColor = darkenColor(currentColor, 0.82);
+      }
     } else {
       previewContainer.style.backgroundColor = isDark() ? '#1a1a1a' : '#f5f5f5';
     }
@@ -639,8 +1097,82 @@ import { locales, defaultLocale, translations as i18nStrings } from "../i18n/tra
 
   bgToggle.addEventListener("change", () => {
     bgEnabled = bgToggle.checked;
+    if (bgEnabled && currentMode === "gradient") {
+      bgCustomColor = darkenColor(gradientColors[0], 0.82);
+      const bgCI = document.getElementById("bg-color-input");
+      const bgHI = document.getElementById("bg-hex-input");
+      const bgSW = document.getElementById("bg-color-swatch");
+      if (bgCI) bgCI.value = bgCustomColor;
+      if (bgHI) bgHI.value = bgCustomColor;
+      if (bgSW) bgSW.style.backgroundColor = bgCustomColor;
+    }
+    updateBgOptionsVisibility();
     updatePreviewBg();
   });
+
+  function updateBgOptionsVisibility() {
+    const bgOpts = document.getElementById("bg-options");
+    if (!bgOpts) return;
+    bgOpts.classList.toggle("hidden", !(bgEnabled && currentMode === "gradient"));
+  }
+
+  function switchBgStyle(style) {
+    bgStyle = style;
+    const bgSolidBtn = document.getElementById("bg-solid-btn");
+    const bgGradientBtn = document.getElementById("bg-gradient-btn");
+    const bgSolidPicker = document.getElementById("bg-solid-picker");
+
+    if (style === "solid") {
+      if (bgSolidBtn) bgSolidBtn.className = "bg-style-btn flex-1 h-7 px-3 text-xs font-medium rounded-md transition-all duration-150 cursor-pointer bg-white dark:bg-neutral-700 text-gray-900 dark:text-gray-100 shadow-sm";
+      if (bgGradientBtn) bgGradientBtn.className = "bg-style-btn flex-1 h-7 px-3 text-xs font-medium rounded-md transition-all duration-150 cursor-pointer text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200";
+      if (bgSolidPicker) bgSolidPicker.classList.remove("hidden");
+    } else {
+      if (bgGradientBtn) bgGradientBtn.className = "bg-style-btn flex-1 h-7 px-3 text-xs font-medium rounded-md transition-all duration-150 cursor-pointer bg-white dark:bg-neutral-700 text-gray-900 dark:text-gray-100 shadow-sm";
+      if (bgSolidBtn) bgSolidBtn.className = "bg-style-btn flex-1 h-7 px-3 text-xs font-medium rounded-md transition-all duration-150 cursor-pointer text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200";
+      if (bgSolidPicker) bgSolidPicker.classList.add("hidden");
+    }
+    updatePreviewBg();
+  }
+
+  document.getElementById("bg-solid-btn")?.addEventListener("click", () => switchBgStyle("solid"));
+  document.getElementById("bg-gradient-btn")?.addEventListener("click", () => switchBgStyle("gradient"));
+
+  const bgColorInput = document.getElementById("bg-color-input");
+  const bgHexInput = document.getElementById("bg-hex-input");
+  const bgColorSwatch = document.getElementById("bg-color-swatch");
+
+  if (bgColorInput) {
+    bgColorInput.addEventListener("input", (e) => {
+      bgCustomColor = e.target.value;
+      if (bgHexInput) bgHexInput.value = bgCustomColor;
+      if (bgColorSwatch) bgColorSwatch.style.backgroundColor = bgCustomColor;
+      updatePreviewBg();
+    });
+  }
+
+  if (bgHexInput) {
+    bgHexInput.addEventListener("input", (e) => {
+      let val = e.target.value.trim();
+      if (!val.startsWith("#")) val = "#" + val;
+      if (isValidHex(val)) {
+        bgCustomColor = val;
+        if (bgColorInput) bgColorInput.value = val;
+        if (bgColorSwatch) bgColorSwatch.style.backgroundColor = val;
+        updatePreviewBg();
+      }
+    });
+    bgHexInput.addEventListener("blur", (e) => {
+      let val = e.target.value.trim();
+      if (!val.startsWith("#")) val = "#" + val;
+      if (isValidHex(val)) {
+        bgCustomColor = val;
+        e.target.value = val;
+        updatePreviewBg();
+      } else {
+        e.target.value = bgCustomColor;
+      }
+    });
+  }
 
   presetGrid.addEventListener("click", (e) => {
     const btn = e.target.closest(".preset-btn");
@@ -703,11 +1235,12 @@ import { locales, defaultLocale, translations as i18nStrings } from "../i18n/tra
   });
 
   copyBtn.addEventListener("click", () => {
-    navigator.clipboard.writeText(currentColor)
+    const textToCopy = currentMode === "gradient" ? gradientColors.join(", ") : currentColor;
+    navigator.clipboard.writeText(textToCopy)
       .then(() => {
         const originalHTML = copyBtn.innerHTML;
         copyBtn.innerHTML = `<svg class="w-4 h-4 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>`;
-        setStatus(tr("copiedColor", currentColor));
+        setStatus(tr("copiedColor", textToCopy));
         setTimeout(() => { copyBtn.innerHTML = originalHTML; }, 1200);
       })
       .catch(() => {
@@ -737,15 +1270,59 @@ import { locales, defaultLocale, translations as i18nStrings } from "../i18n/tra
     setStatus(tr("sizeSetTo", exportSize));
   });
 
+  // === Export helpers ===
+  function buildGradientDefsForClone(svgEl) {
+    const tpl = tplDefs[currentTemplateId];
+    if (!tpl) return;
+
+    const ns = "http://www.w3.org/2000/svg";
+    let defs = svgEl.querySelector("defs");
+    if (!defs) {
+      defs = document.createElementNS(ns, "defs");
+      svgEl.insertBefore(defs, svgEl.firstChild);
+    }
+
+    let gradEl = defs.querySelector("#apatch-grad");
+    if (gradEl) gradEl.remove();
+
+    gradEl = document.createElementNS(ns, tpl.type);
+    gradEl.setAttribute("id", "apatch-grad");
+    gradEl.setAttribute("gradientUnits", "userSpaceOnUse");
+    for (const [k, v] of Object.entries(tpl.attrs)) {
+      gradEl.setAttribute(k, v);
+    }
+
+    gradientColors.forEach((c, i) => {
+      const stop = document.createElementNS(ns, "stop");
+      const pct = gradientColors.length === 1 ? 0 : Math.round((i / (gradientColors.length - 1)) * 100);
+      stop.setAttribute("offset", `${pct}%`);
+      stop.setAttribute("stop-color", c);
+      gradEl.appendChild(stop);
+    });
+
+    defs.appendChild(gradEl);
+  }
+
   function getCleanSvg(size) {
     const svgEl = icon.cloneNode(true);
     svgEl.removeAttribute("class");
     svgEl.removeAttribute("id");
     svgEl.removeAttribute("data-icon");
+    svgEl.removeAttribute("data-mode");
     svgEl.setAttribute("width", String(size));
     svgEl.setAttribute("height", String(size));
     svgEl.setAttribute("viewBox", "0 0 512 512");
     svgEl.setAttribute("xmlns", "http://www.w3.org/2000/svg");
+
+    const existingDefs = svgEl.querySelector("defs");
+    if (currentMode === "gradient") {
+      if (existingDefs) existingDefs.remove();
+      buildGradientDefsForClone(svgEl);
+      svgEl.querySelectorAll("path").forEach(p => p.setAttribute("fill", "url(#apatch-grad)"));
+    } else {
+      if (existingDefs) existingDefs.remove();
+    }
+
     return svgEl;
   }
 
@@ -756,6 +1333,13 @@ import { locales, defaultLocale, translations as i18nStrings } from "../i18n/tra
     link.href = url;
     link.click();
     setTimeout(() => URL.revokeObjectURL(url), 0);
+  }
+
+  function getColorSuffix() {
+    if (currentMode === "gradient") {
+      return gradientColors.map(c => c.replace("#", "")).join("-");
+    }
+    return currentColor.replace("#", "");
   }
 
   downloadBtn.addEventListener("click", () => {
@@ -780,8 +1364,18 @@ import { locales, defaultLocale, translations as i18nStrings } from "../i18n/tra
       }
 
       if (bgEnabled) {
-        ctx.fillStyle = darkenColor(currentColor, 0.82);
-        ctx.fillRect(0, 0, exportSize, exportSize);
+        if (currentMode === "gradient" && bgStyle === "gradient") {
+          const darkened = gradientColors.map(c => darkenColor(c, 0.5));
+          const grad = createCanvasGradient(ctx, exportSize, darkened, currentTemplateId);
+          ctx.fillStyle = grad;
+          ctx.fillRect(0, 0, exportSize, exportSize);
+        } else if (currentMode === "gradient") {
+          ctx.fillStyle = bgCustomColor;
+          ctx.fillRect(0, 0, exportSize, exportSize);
+        } else {
+          ctx.fillStyle = darkenColor(currentColor, 0.82);
+          ctx.fillRect(0, 0, exportSize, exportSize);
+        }
       }
 
       const offset = Math.round((exportSize - iconSize) / 2);
@@ -790,7 +1384,8 @@ import { locales, defaultLocale, translations as i18nStrings } from "../i18n/tra
 
       const pngUrl = canvas.toDataURL("image/png");
       const link = document.createElement("a");
-      link.download = `apatch-icon-${currentColor.replace("#", "")}-${exportSize}x${exportSize}-${iconSize}px${bgEnabled ? "-bg" : ""}.png`;
+      const modeSuffix = currentMode === "gradient" ? "-gradient" : "";
+      link.download = `apatch-icon-${getColorSuffix()}-${exportSize}x${exportSize}-${iconSize}px${bgEnabled ? "-bg" : ""}${modeSuffix}.png`;
       link.href = pngUrl;
       link.click();
       setStatus(tr("pngExported", `${exportSize}x${exportSize}`));
@@ -808,12 +1403,32 @@ import { locales, defaultLocale, translations as i18nStrings } from "../i18n/tra
       const svgEl = getCleanSvg(iconSize);
       const svgData = new XMLSerializer().serializeToString(svgEl);
       const offset = Math.round((exportSize - iconSize) / 2);
-      const filename = `apatch-icon-${currentColor.replace("#", "")}-${exportSize}x${exportSize}-${iconSize}px${bgEnabled ? "-bg" : ""}.svg`;
+      const modeSuffix = currentMode === "gradient" ? "-gradient" : "";
+      const filename = `apatch-icon-${getColorSuffix()}-${exportSize}x${exportSize}-${iconSize}px${bgEnabled ? "-bg" : ""}${modeSuffix}.svg`;
 
       if (bgEnabled || previewScale < 1) {
-        const bgColor = bgEnabled ? darkenColor(currentColor, 0.82) : "none";
-        const rect = bgColor !== "none" ? `<rect width="100%" height="100%" fill="${bgColor}"/>` : "";
-        const wrappedSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="${exportSize}" height="${exportSize}" viewBox="0 0 ${exportSize} ${exportSize}">${rect}<g transform="translate(${offset}, ${offset})">${svgData}</g></svg>`;
+        let bgContent = "";
+        let bgDefs = "";
+
+        if (bgEnabled && currentMode === "gradient" && bgStyle === "gradient") {
+          const darkened = gradientColors.map(c => darkenColor(c, 0.5));
+          const tpl = tplDefs[currentTemplateId];
+          let gradAttrs = "";
+          for (const [k, v] of Object.entries(tpl.attrs)) {
+            gradAttrs += ` ${k}="${v}"`;
+          }
+          const stops = darkened.map((c, i) => {
+            const pct = darkened.length === 1 ? 0 : Math.round((i / (darkened.length - 1)) * 100);
+            return `<stop offset="${pct}%" stop-color="${c}"/>`;
+          }).join("");
+          bgDefs = `<defs><${tpl.type} id="bg-grad" gradientUnits="userSpaceOnUse"${gradAttrs}>${stops}</${tpl.type}></defs>`;
+          bgContent = `<rect width="100%" height="100%" fill="url(#bg-grad)"/>`;
+        } else if (bgEnabled) {
+          const bgColor = currentMode === "gradient" ? bgCustomColor : darkenColor(currentColor, 0.82);
+          bgContent = `<rect width="100%" height="100%" fill="${bgColor}"/>`;
+        }
+
+        const wrappedSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="${exportSize}" height="${exportSize}" viewBox="0 0 ${exportSize} ${exportSize}">${bgDefs}${bgContent}<g transform="translate(${offset}, ${offset})">${svgData}</g></svg>`;
         downloadBlob(new Blob([wrappedSvg], { type: "image/svg+xml;charset=utf-8" }), filename);
       } else {
         downloadBlob(new Blob([svgData], { type: "image/svg+xml;charset=utf-8" }), filename);
@@ -830,6 +1445,7 @@ import { locales, defaultLocale, translations as i18nStrings } from "../i18n/tra
     updatePreviewScale();
   });
 
+  // === Init ===
   updateExportSize(exportSize);
   updatePreviewScale();
   updateColor(currentColor);
