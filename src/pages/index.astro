@@ -2,34 +2,126 @@
 import Layout from "../layouts/Layout.astro";
 import APatchIcon from "../components/APatchIcon.astro";
 import { presets } from "../components/presets.ts";
+import { locales, defaultLocale, translations as i18nStrings } from "../i18n/translations.ts";
 ---
 
 <Layout title="APatch Icon Generator">
   <main class="min-h-screen flex flex-col px-4 py-8 md:py-12 lg:py-16">
 
-    <!-- Theme Toggle -->
-    <div class="fixed top-4 right-4 z-50">
-      <button
-        id="theme-toggle"
-        class="w-10 h-10 rounded-xl bg-neutral-100 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 flex items-center justify-center hover:bg-neutral-200 dark:hover:bg-neutral-700 transition-colors duration-150 cursor-pointer"
-        title="Toggle theme"
-        aria-label="Toggle theme"
-      >
-        <svg id="icon-sun" class="w-5 h-5 text-gray-600 dark:text-gray-300 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/>
-        </svg>
-        <svg id="icon-moon" class="w-5 h-5 text-gray-600 dark:text-gray-300 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/>
-        </svg>
-      </button>
+    <!-- Controls: Mobile = single menu button (top-right), Desktop = separate buttons (top-left) -->
+    <div class="fixed top-2 right-2 md:top-4 md:left-4 md:right-auto z-50">
+
+      <!-- Mobile: Single menu button with popover -->
+      <div class="md:hidden" id="mobile-menu-wrapper">
+        <button
+          id="mobile-menu-btn"
+          class="w-9 h-9 rounded-full bg-neutral-100/90 dark:bg-neutral-800/90 backdrop-blur-sm border border-neutral-200 dark:border-neutral-700 flex items-center justify-center hover:bg-neutral-200 dark:hover:bg-neutral-700 transition-colors duration-150 cursor-pointer"
+          aria-label="Settings"
+          aria-expanded="false"
+        >
+          <svg class="w-5 h-5 text-gray-600 dark:text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/>
+          </svg>
+        </button>
+        <div
+          id="mobile-menu-panel"
+          class="absolute right-0 top-11 w-48 rounded-xl bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 shadow-lg hidden z-[60] overflow-hidden"
+        >
+          <!-- Theme row -->
+          <button
+            id="mobile-theme-btn"
+            class="w-full flex items-center gap-3 px-3 py-2.5 text-sm text-gray-700 dark:text-gray-300 hover:bg-neutral-100 dark:hover:bg-neutral-700 transition-colors cursor-pointer border-b border-neutral-100 dark:border-neutral-700"
+          >
+            <svg id="mobile-icon-sun" class="w-4.5 h-4.5 text-gray-500 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/>
+            </svg>
+            <svg id="mobile-icon-moon" class="w-4.5 h-4.5 text-gray-500 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/>
+            </svg>
+            <span data-i18n="toggleTheme">Toggle theme</span>
+          </button>
+          <!-- Language list -->
+          <div class="py-1" role="listbox" aria-label="Select language">
+            {locales.map((loc) => (
+              <button
+                data-lang={loc.code}
+                class="lang-option w-full text-left px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-neutral-100 dark:hover:bg-neutral-700 transition-colors cursor-pointer flex items-center gap-2"
+                role="option"
+                aria-selected={loc.code === defaultLocale ? "true" : "false"}
+              >
+                <span>{loc.native}</span>
+                {loc.code === defaultLocale && (
+                  <svg class="w-4 h-4 ml-auto shrink-0 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+                  </svg>
+                )}
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      <!-- Desktop: Separate theme + lang buttons -->
+      <div class="hidden md:flex items-center gap-2">
+        <button
+          id="theme-toggle"
+          class="w-10 h-10 rounded-xl bg-neutral-100/90 dark:bg-neutral-800/90 backdrop-blur-sm border border-neutral-200 dark:border-neutral-700 flex items-center justify-center hover:bg-neutral-200 dark:hover:bg-neutral-700 transition-colors duration-150 cursor-pointer"
+          data-i18n-title="toggleTheme"
+          aria-label="Toggle theme"
+        >
+          <svg id="icon-sun" class="w-5 h-5 text-gray-600 dark:text-gray-300 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/>
+          </svg>
+          <svg id="icon-moon" class="w-5 h-5 text-gray-600 dark:text-gray-300 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/>
+          </svg>
+        </button>
+
+        <div class="relative" id="lang-switcher-wrapper">
+          <button
+            id="lang-toggle"
+            class="w-10 h-10 rounded-xl bg-neutral-100/90 dark:bg-neutral-800/90 backdrop-blur-sm border border-neutral-200 dark:border-neutral-700 flex items-center justify-center hover:bg-neutral-200 dark:hover:bg-neutral-700 transition-colors duration-150 cursor-pointer"
+            data-i18n-title="language"
+            aria-label="Language"
+            aria-expanded="false"
+            aria-haspopup="listbox"
+          >
+            <svg class="w-5 h-5 text-gray-600 dark:text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"/>
+            </svg>
+          </button>
+          <div
+            id="lang-dropdown"
+            class="absolute left-0 top-11 w-40 rounded-xl bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 shadow-lg py-1 hidden z-[60] min-w-max"
+            role="listbox"
+            aria-label="Select language"
+          >
+            {locales.map((loc) => (
+              <button
+                data-lang={loc.code}
+                class="lang-option w-full text-left px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-neutral-100 dark:hover:bg-neutral-700 transition-colors cursor-pointer flex items-center gap-2 whitespace-nowrap"
+                role="option"
+                aria-selected={loc.code === defaultLocale ? "true" : "false"}
+              >
+                <span>{loc.native}</span>
+                {loc.code === defaultLocale && (
+                  <svg class="w-4 h-4 ml-auto shrink-0 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+                  </svg>
+                )}
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
     </div>
 
     <!-- Header -->
     <header class="text-center mb-8 md:mb-10 lg:mb-12">
-      <h1 class="text-2xl md:text-3xl lg:text-4xl font-bold tracking-tight text-gray-900 dark:text-gray-50 mb-2">
+      <h1 class="text-2xl md:text-3xl lg:text-4xl font-bold tracking-tight text-gray-900 dark:text-gray-50 mb-2" data-i18n="title">
         APatch Icon Generator
       </h1>
-      <p class="text-xs md:text-sm text-gray-500 dark:text-gray-400">
+      <p class="text-xs md:text-sm text-gray-500 dark:text-gray-400" data-i18n="subtitle">
         Generate multi-color APatch icons for your device
       </p>
     </header>
@@ -51,7 +143,7 @@ import { presets } from "../components/presets.ts";
 
         <!-- Preview Scale -->
         <div class="flex items-center justify-center gap-3 mt-4 mb-1">
-          <span class="text-xs text-gray-400 dark:text-gray-500 shrink-0">Preview</span>
+          <span class="text-xs text-gray-400 dark:text-gray-500 shrink-0" data-i18n="preview">Preview</span>
           <input
             id="preview-scale-range"
             type="range"
@@ -76,7 +168,7 @@ import { presets } from "../components/presets.ts";
           <button
             id="copy-btn"
             class="ml-1 p-1.5 rounded-lg hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors duration-150 group"
-            title="Copy color code"
+            data-i18n-title="copyColorCode"
             aria-label="Copy color code"
           >
             <svg class="w-4 h-4 text-gray-400 group-hover:text-gray-700 dark:group-hover:text-gray-200 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -91,7 +183,7 @@ import { presets } from "../components/presets.ts";
 
         <!-- Preset Colors -->
         <div>
-          <h2 class="text-xs font-semibold uppercase tracking-widest text-gray-400 dark:text-gray-500 mb-4 px-1">
+          <h2 class="text-xs font-semibold uppercase tracking-widest text-gray-400 dark:text-gray-500 mb-4 px-1" data-i18n="presetColors">
             Preset Colors
           </h2>
           <div class="grid grid-cols-8 gap-2 pt-6 pb-6" id="preset-grid" role="listbox" aria-label="Preset color palette">
@@ -121,7 +213,7 @@ import { presets } from "../components/presets.ts";
 
         <!-- Custom Color -->
         <div>
-          <h2 class="text-xs font-semibold uppercase tracking-widest text-gray-400 dark:text-gray-500 mb-4 px-1">
+          <h2 class="text-xs font-semibold uppercase tracking-widest text-gray-400 dark:text-gray-500 mb-4 px-1" data-i18n="customColor">
             Custom Color
           </h2>
           <div class="flex items-center gap-3">
@@ -155,7 +247,7 @@ import { presets } from "../components/presets.ts";
 
         <!-- Background Option -->
         <div>
-          <h2 class="text-xs font-semibold uppercase tracking-widest text-gray-400 dark:text-gray-500 mb-4 px-1">
+          <h2 class="text-xs font-semibold uppercase tracking-widest text-gray-400 dark:text-gray-500 mb-4 px-1" data-i18n="exportOptions">
             Export Options
           </h2>
           <label class="flex items-center gap-3 cursor-pointer select-none group" id="bg-toggle-label">
@@ -164,20 +256,20 @@ import { presets } from "../components/presets.ts";
               <div class="w-11 h-6 bg-neutral-200 dark:bg-neutral-700 rounded-full peer-checked:bg-gray-900 dark:peer-checked:bg-white transition-colors duration-200"></div>
               <div class="absolute top-0.5 left-0.5 w-5 h-5 bg-white dark:bg-neutral-900 rounded-full shadow-sm peer-checked:translate-x-5 transition-transform duration-200"></div>
             </div>
-            <span class="text-sm text-gray-700 dark:text-gray-300 group-hover:text-gray-900 dark:group-hover:text-white transition-colors">
+            <span class="text-sm text-gray-700 dark:text-gray-300 group-hover:text-gray-900 dark:group-hover:text-white transition-colors" data-i18n="coloredBackground">
               Colored Background
             </span>
-            <span class="text-xs text-gray-400 dark:text-gray-500">Adaptive icon style</span>
+            <span class="text-xs text-gray-400 dark:text-gray-500 hidden sm:inline" data-i18n="adaptiveIconStyle">Adaptive icon style</span>
           </label>
         </div>
 
         <!-- Export Size -->
         <div>
-          <h2 class="text-xs font-semibold uppercase tracking-widest text-gray-400 dark:text-gray-500 mb-4 px-1">
+          <h2 class="text-xs font-semibold uppercase tracking-widest text-gray-400 dark:text-gray-500 mb-4 px-1" data-i18n="exportSize">
             Export Size
           </h2>
           <div class="space-y-3">
-            <label for="size-range" class="text-sm text-gray-700 dark:text-gray-300">Export resolution: <span id="size-display" class="font-semibold">512</span> px</label>
+            <label for="size-range" class="text-sm text-gray-700 dark:text-gray-300"><span data-i18n="exportResolution">Export resolution:</span> <span id="size-display" class="font-semibold">512</span> px</label>
             <div id="size-quick-picks" class="flex flex-wrap gap-2" role="group" aria-label="Common export sizes">
               <button type="button" data-size="128" data-active="false" class="size-chip h-8 px-3 rounded-lg text-xs font-medium border border-neutral-300 dark:border-neutral-700 text-gray-700 dark:text-gray-300 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors data-[active=true]:bg-gray-900 data-[active=true]:text-white data-[active=true]:border-gray-900 data-[active=true]:hover:bg-gray-900 dark:data-[active=true]:bg-white dark:data-[active=true]:text-gray-900 dark:data-[active=true]:border-white dark:data-[active=true]:hover:bg-white">128</button>
               <button type="button" data-size="256" data-active="false" class="size-chip h-8 px-3 rounded-lg text-xs font-medium border border-neutral-300 dark:border-neutral-700 text-gray-700 dark:text-gray-300 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors data-[active=true]:bg-gray-900 data-[active=true]:text-white data-[active=true]:border-gray-900 data-[active=true]:hover:bg-gray-900 dark:data-[active=true]:bg-white dark:data-[active=true]:text-gray-900 dark:data-[active=true]:border-white dark:data-[active=true]:hover:bg-white">256</button>
@@ -207,7 +299,7 @@ import { presets } from "../components/presets.ts";
                 class="w-32 h-11 px-3 rounded-xl border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 text-sm text-gray-800 dark:text-gray-200 focus:outline-none focus:border-gray-400 dark:focus:border-gray-500"
                 aria-label="Export size in pixels"
               />
-              <span class="text-xs text-gray-500 dark:text-gray-400">64 to 4096, increments of 64</span>
+              <span class="text-xs text-gray-500 dark:text-gray-400" data-i18n="sizeRange">64 to 4096, increments of 64</span>
             </div>
           </div>
         </div>
@@ -223,7 +315,7 @@ import { presets } from "../components/presets.ts";
               <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
               </svg>
-              Export PNG
+              <span data-i18n="exportPng">Export PNG</span>
             </button>
             <button
               id="download-svg-btn"
@@ -233,7 +325,7 @@ import { presets } from "../components/presets.ts";
               <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M12 5v14m0 0l-5-5m5 5l5-5M5 19h14"/>
               </svg>
-              Export SVG
+              <span data-i18n="exportSvg">Export SVG</span>
             </button>
           </div>
           <p id="status-message" class="mt-3 text-xs text-gray-500 dark:text-gray-400 min-h-4" aria-live="polite"></p>
@@ -243,7 +335,7 @@ import { presets } from "../components/presets.ts";
 
     <!-- Footer -->
     <footer class="mt-auto pt-8 text-center">
-      <p class="text-xs text-gray-400 dark:text-gray-500">
+      <p class="text-xs text-gray-400 dark:text-gray-500" data-i18n-html="footer">
         &copy; Matsuzaka Yuki &middot;
         <a
           href="https://github.com/matsuzaka-yuki"
@@ -263,7 +355,133 @@ import { presets } from "../components/presets.ts";
   </main>
 </Layout>
 
-<script define:vars={{ presets }}>
+<script define:vars={{ presets, translations: i18nStrings }}>
+
+  const supportedLocales = ["en", "zh-CN", "ja", "zh-TW"];
+  let currentLocale = localStorage.getItem("locale") || "en";
+  if (!supportedLocales.includes(currentLocale)) currentLocale = "en";
+
+  function tr(key, ...args) {
+    const fn = translations[currentLocale]?.[key];
+    if (typeof fn === "function") return fn(...args);
+    return fn || key;
+  }
+
+  function applyTranslations() {
+    document.querySelectorAll("[data-i18n]").forEach((el) => {
+      const key = el.getAttribute("data-i18n");
+      el.textContent = tr(key);
+    });
+    document.querySelectorAll("[data-i18n-title]").forEach((el) => {
+      const key = el.getAttribute("data-i18n-title");
+      el.title = tr(key);
+    });
+    document.querySelectorAll("[data-i18n-html]").forEach((el) => {
+      const key = el.getAttribute("data-i18n-html");
+      el.innerHTML = tr(key);
+    });
+    const langMap = { "zh-CN": "zh-CN", "zh-TW": "zh-TW", "ja": "ja", "en": "en" };
+    document.documentElement.lang = langMap[currentLocale] || "en";
+  }
+
+  function updateLangCheckmarks() {
+    document.querySelectorAll(".lang-option").forEach((btn) => {
+      const isSelected = btn.dataset.lang === currentLocale;
+      btn.setAttribute("aria-selected", isSelected ? "true" : "false");
+      let checkmark = btn.querySelector("svg");
+      if (isSelected && !checkmark) {
+        checkmark = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+        checkmark.setAttribute("class", "w-4 h-4 ml-auto shrink-0 text-gray-400");
+        checkmark.setAttribute("fill", "none");
+        checkmark.setAttribute("viewBox", "0 0 24 24");
+        checkmark.setAttribute("stroke", "currentColor");
+        checkmark.setAttribute("stroke-width", "2");
+        const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+        path.setAttribute("stroke-linecap", "round");
+        path.setAttribute("stroke-linejoin", "round");
+        path.setAttribute("d", "M5 13l4 4L19 7");
+        checkmark.appendChild(path);
+        btn.appendChild(checkmark);
+      } else if (!isSelected && checkmark) {
+        checkmark.remove();
+      }
+    });
+  }
+
+  // === Mobile menu (single button for theme + language) ===
+  const mobileMenuBtn = document.getElementById("mobile-menu-btn");
+  const mobileMenuPanel = document.getElementById("mobile-menu-panel");
+  const mobileThemeBtn = document.getElementById("mobile-theme-btn");
+
+  function closeMobileMenu() {
+    if (mobileMenuPanel) mobileMenuPanel.classList.add("hidden");
+    if (mobileMenuBtn) mobileMenuBtn.setAttribute("aria-expanded", "false");
+  }
+
+  function toggleMobileMenu() {
+    if (!mobileMenuPanel || !mobileMenuBtn) return;
+    const isOpen = !mobileMenuPanel.classList.contains("hidden");
+    if (isOpen) { closeMobileMenu(); return; }
+    mobileMenuPanel.classList.remove("hidden");
+    mobileMenuBtn.setAttribute("aria-expanded", "true");
+  }
+
+  if (mobileMenuBtn) {
+    mobileMenuBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      toggleMobileMenu();
+    });
+  }
+
+  if (mobileThemeBtn) {
+    mobileThemeBtn.addEventListener("click", () => {
+      document.documentElement.classList.toggle("dark");
+      localStorage.setItem("theme", isDark() ? "dark" : "light");
+      updateAllThemeIcons();
+      updatePreviewBg();
+    });
+  }
+
+  // Close mobile menu on outside click
+  document.addEventListener("click", (e) => {
+    const wrapper = document.getElementById("mobile-menu-wrapper");
+    if (wrapper && !wrapper.contains(e.target)) closeMobileMenu();
+
+    const desktopWrapper = document.getElementById("lang-switcher-wrapper");
+    if (desktopWrapper && !desktopWrapper.contains(e.target)) {
+      langDropdown?.classList.add("hidden");
+      langToggle?.setAttribute("aria-expanded", "false");
+    }
+  });
+
+  // === Desktop language switcher ===
+  const langToggle = document.getElementById("lang-toggle");
+  const langDropdown = document.getElementById("lang-dropdown");
+
+  if (langToggle) {
+    langToggle.addEventListener("click", (e) => {
+      e.stopPropagation();
+      const isOpen = !langDropdown.classList.contains("hidden");
+      langDropdown.classList.toggle("hidden");
+      langToggle.setAttribute("aria-expanded", String(!isOpen));
+    });
+  }
+
+  document.querySelectorAll(".lang-option").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      currentLocale = btn.dataset.lang;
+      localStorage.setItem("locale", currentLocale);
+      applyTranslations();
+      updateLangCheckmarks();
+      langDropdown?.classList.add("hidden");
+      langToggle?.setAttribute("aria-expanded", "false");
+      closeMobileMenu();
+    });
+  });
+
+  applyTranslations();
+  updateLangCheckmarks();
+
   const icon = document.getElementById("apatch-icon");
   const colorSwatch = document.getElementById("color-swatch");
   const colorCode = document.getElementById("color-code");
@@ -306,14 +524,17 @@ import { presets } from "../components/presets.ts";
   }
 
   function updateThemeIcon() {
-    if (isDark()) {
-      iconSun.classList.remove("hidden");
-      iconMoon.classList.add("hidden");
-    } else {
-      iconSun.classList.add("hidden");
-      iconMoon.classList.remove("hidden");
-    }
+    const showSun = isDark();
+    if (iconSun) iconSun.classList.toggle("hidden", !showSun);
+    if (iconMoon) iconMoon.classList.toggle("hidden", showSun);
+    // Mobile icons
+    const mSun = document.getElementById("mobile-icon-sun");
+    const mMoon = document.getElementById("mobile-icon-moon");
+    if (mSun) mSun.classList.toggle("hidden", !showSun);
+    if (mMoon) mMoon.classList.toggle("hidden", showSun);
   }
+
+  function updateAllThemeIcons() { updateThemeIcon(); }
 
   themeToggle.addEventListener("click", () => {
     document.documentElement.classList.toggle("dark");
@@ -484,11 +705,11 @@ import { presets } from "../components/presets.ts";
       .then(() => {
         const originalHTML = copyBtn.innerHTML;
         copyBtn.innerHTML = `<svg class="w-4 h-4 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>`;
-        setStatus(`Copied color ${currentColor}`);
+        setStatus(tr("copiedColor", currentColor));
         setTimeout(() => { copyBtn.innerHTML = originalHTML; }, 1200);
       })
       .catch(() => {
-        setStatus("Clipboard permission denied. Please copy manually.", true);
+        setStatus(tr("clipboardDenied"), true);
       });
   });
 
@@ -511,7 +732,7 @@ import { presets } from "../components/presets.ts";
     const chip = e.target.closest(".size-chip");
     if (!chip) return;
     updateExportSize(Number(chip.dataset.size));
-    setStatus(`Export size set to ${exportSize}px`);
+    setStatus(tr("sizeSetTo", exportSize));
   });
 
   function getCleanSvg(size) {
@@ -551,7 +772,7 @@ import { presets } from "../components/presets.ts";
 
       if (!ctx) {
         URL.revokeObjectURL(url);
-        setStatus("Unable to initialize canvas for PNG export.", true);
+        setStatus(tr("canvasError"), true);
         return;
       }
 
@@ -568,11 +789,11 @@ import { presets } from "../components/presets.ts";
       link.download = `apatch-icon-${currentColor.replace("#", "")}-${exportSize}x${exportSize}${bgEnabled ? "-bg" : ""}.png`;
       link.href = pngUrl;
       link.click();
-      setStatus(`PNG exported at ${exportSize}x${exportSize}`);
+      setStatus(tr("pngExported", `${exportSize}x${exportSize}`));
     };
     img.onerror = () => {
       URL.revokeObjectURL(url);
-      setStatus("Failed to render image for PNG export.", true);
+      setStatus(tr("renderError"), true);
     };
     img.src = url;
   });
@@ -591,9 +812,9 @@ import { presets } from "../components/presets.ts";
         downloadBlob(new Blob([svgData], { type: "image/svg+xml;charset=utf-8" }), filename);
       }
 
-      setStatus(`SVG exported at ${exportSize}x${exportSize}`);
+      setStatus(tr("svgExported", `${exportSize}x${exportSize}`));
     } catch {
-      setStatus("SVG export failed.", true);
+      setStatus(tr("svgExportFailed"), true);
     }
   });
 
