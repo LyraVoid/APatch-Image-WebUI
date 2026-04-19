@@ -49,8 +49,24 @@ import { presets } from "../components/presets.ts";
           </div>
         </div>
 
+        <!-- Preview Scale -->
+        <div class="flex items-center justify-center gap-3 mt-4 mb-1">
+          <span class="text-xs text-gray-400 dark:text-gray-500 shrink-0">Preview</span>
+          <input
+            id="preview-scale-range"
+            type="range"
+            min="25"
+            max="200"
+            step="5"
+            value="100"
+            class="flex-1 accent-gray-900 dark:accent-gray-100"
+            aria-label="Preview scale"
+          />
+          <span id="preview-scale-display" class="text-xs font-mono text-gray-500 dark:text-gray-400 w-9 text-right shrink-0">100%</span>
+        </div>
+
         <!-- Current Color Display -->
-        <div class="flex items-center justify-center gap-3 mt-4">
+        <div class="flex items-center justify-center gap-3 mt-3">
           <span
             id="color-swatch"
             class="w-5 h-5 md:w-6 md:h-6 rounded-full border border-neutral-300 dark:border-neutral-600 transition-colors duration-200"
@@ -161,18 +177,20 @@ import { presets } from "../components/presets.ts";
             Export Size
           </h2>
           <div class="space-y-3">
-            <label for="size-range" class="text-sm text-gray-700 dark:text-gray-300">Icon size: <span id="size-display" class="font-semibold">512</span> px</label>
+            <label for="size-range" class="text-sm text-gray-700 dark:text-gray-300">Export resolution: <span id="size-display" class="font-semibold">512</span> px</label>
             <div id="size-quick-picks" class="flex flex-wrap gap-2" role="group" aria-label="Common export sizes">
               <button type="button" data-size="128" data-active="false" class="size-chip h-8 px-3 rounded-lg text-xs font-medium border border-neutral-300 dark:border-neutral-700 text-gray-700 dark:text-gray-300 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors data-[active=true]:bg-gray-900 data-[active=true]:text-white data-[active=true]:border-gray-900 data-[active=true]:hover:bg-gray-900 dark:data-[active=true]:bg-white dark:data-[active=true]:text-gray-900 dark:data-[active=true]:border-white dark:data-[active=true]:hover:bg-white">128</button>
               <button type="button" data-size="256" data-active="false" class="size-chip h-8 px-3 rounded-lg text-xs font-medium border border-neutral-300 dark:border-neutral-700 text-gray-700 dark:text-gray-300 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors data-[active=true]:bg-gray-900 data-[active=true]:text-white data-[active=true]:border-gray-900 data-[active=true]:hover:bg-gray-900 dark:data-[active=true]:bg-white dark:data-[active=true]:text-gray-900 dark:data-[active=true]:border-white dark:data-[active=true]:hover:bg-white">256</button>
               <button type="button" data-size="512" data-active="false" class="size-chip h-8 px-3 rounded-lg text-xs font-medium border border-neutral-300 dark:border-neutral-700 text-gray-700 dark:text-gray-300 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors data-[active=true]:bg-gray-900 data-[active=true]:text-white data-[active=true]:border-gray-900 data-[active=true]:hover:bg-gray-900 dark:data-[active=true]:bg-white dark:data-[active=true]:text-gray-900 dark:data-[active=true]:border-white dark:data-[active=true]:hover:bg-white">512</button>
               <button type="button" data-size="1024" data-active="false" class="size-chip h-8 px-3 rounded-lg text-xs font-medium border border-neutral-300 dark:border-neutral-700 text-gray-700 dark:text-gray-300 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors data-[active=true]:bg-gray-900 data-[active=true]:text-white data-[active=true]:border-gray-900 data-[active=true]:hover:bg-gray-900 dark:data-[active=true]:bg-white dark:data-[active=true]:text-gray-900 dark:data-[active=true]:border-white dark:data-[active=true]:hover:bg-white">1024</button>
+              <button type="button" data-size="2048" data-active="false" class="size-chip h-8 px-3 rounded-lg text-xs font-medium border border-neutral-300 dark:border-neutral-700 text-gray-700 dark:text-gray-300 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors data-[active=true]:bg-gray-900 data-[active=true]:text-white data-[active=true]:border-gray-900 data-[active=true]:hover:bg-gray-900 dark:data-[active=true]:bg-white dark:data-[active=true]:text-gray-900 dark:data-[active=true]:border-white dark:data-[active=true]:hover:bg-white">2048</button>
+              <button type="button" data-size="4096" data-active="false" class="size-chip h-8 px-3 rounded-lg text-xs font-medium border border-neutral-300 dark:border-neutral-700 text-gray-700 dark:text-gray-300 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors data-[active=true]:bg-gray-900 data-[active=true]:text-white data-[active=true]:border-gray-900 data-[active=true]:hover:bg-gray-900 dark:data-[active=true]:bg-white dark:data-[active=true]:text-gray-900 dark:data-[active=true]:border-white dark:data-[active=true]:hover:bg-white">4096</button>
             </div>
             <input
               id="size-range"
               type="range"
               min="64"
-              max="2048"
+              max="4096"
               step="64"
               value="512"
               class="w-full accent-gray-900 dark:accent-gray-100"
@@ -183,13 +201,13 @@ import { presets } from "../components/presets.ts";
                 id="size-input"
                 type="number"
                 min="64"
-                max="2048"
+                max="4096"
                 step="64"
                 value="512"
                 class="w-32 h-11 px-3 rounded-xl border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 text-sm text-gray-800 dark:text-gray-200 focus:outline-none focus:border-gray-400 dark:focus:border-gray-500"
                 aria-label="Export size in pixels"
               />
-              <span class="text-xs text-gray-500 dark:text-gray-400">64 to 2048, increments of 64</span>
+              <span class="text-xs text-gray-500 dark:text-gray-400">64 to 4096, increments of 64</span>
             </div>
           </div>
         </div>
@@ -266,10 +284,13 @@ import { presets } from "../components/presets.ts";
   const sizeDisplay = document.getElementById("size-display");
   const sizeQuickPicks = document.getElementById("size-quick-picks");
   const statusMessage = document.getElementById("status-message");
+  const previewScaleRange = document.getElementById("preview-scale-range");
+  const previewScaleDisplay = document.getElementById("preview-scale-display");
 
   let currentColor = "#3ddc84";
   let bgEnabled = false;
   let exportSize = 512;
+  let previewScale = 1.0;
 
   function setStatus(message, isError = false) {
     if (!statusMessage) return;
@@ -320,7 +341,7 @@ import { presets } from "../components/presets.ts";
   function clampExportSize(size) {
     if (!Number.isFinite(size)) return 512;
     const snapped = Math.round(size / 64) * 64;
-    return Math.min(2048, Math.max(64, snapped));
+    return Math.min(4096, Math.max(64, snapped));
   }
 
   function updateExportSize(size) {
@@ -328,8 +349,6 @@ import { presets } from "../components/presets.ts";
     sizeRange.value = String(exportSize);
     sizeInput.value = String(exportSize);
     sizeDisplay.textContent = String(exportSize);
-
-    updatePreviewScale();
 
     document.querySelectorAll(".size-chip").forEach((chip) => {
       const chipSize = Number(chip.dataset.size);
@@ -340,14 +359,9 @@ import { presets } from "../components/presets.ts";
   function updatePreviewScale() {
     const iconWrapper = document.getElementById("icon-wrapper");
     if (!iconWrapper) return;
-
-    const minSize = 64;
-    const maxSize = 2048;
-    const minScale = 0.5;
-    const maxScale = 2.0;
-
-    const scale = minScale + ((exportSize - minSize) / (maxSize - minSize)) * (maxScale - minScale);
-    iconWrapper.style.transform = `scale(${scale.toFixed(2)})`;
+    iconWrapper.style.transform = `scale(${previewScale.toFixed(2)})`;
+    previewScaleDisplay.textContent = `${Math.round(previewScale * 100)}%`;
+    previewScaleRange.value = String(Math.round(previewScale * 100));
   }
 
   function getPresetButtons() {
@@ -581,6 +595,11 @@ import { presets } from "../components/presets.ts";
     } catch {
       setStatus("SVG export failed.", true);
     }
+  });
+
+  previewScaleRange.addEventListener("input", (e) => {
+    previewScale = Number(e.target.value) / 100;
+    updatePreviewScale();
   });
 
   updateExportSize(exportSize);
