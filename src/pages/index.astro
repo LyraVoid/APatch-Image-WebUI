@@ -757,7 +757,8 @@ import { locales, defaultLocale, translations as i18nStrings } from "../i18n/tra
   }
 
   downloadBtn.addEventListener("click", () => {
-    const svgEl = getCleanSvg(exportSize);
+    const iconSize = Math.round(exportSize * previewScale);
+    const svgEl = getCleanSvg(iconSize);
 
     const svgData = new XMLSerializer().serializeToString(svgEl);
     const svgBlob = new Blob([svgData], { type: "image/svg+xml;charset=utf-8" });
@@ -781,12 +782,13 @@ import { locales, defaultLocale, translations as i18nStrings } from "../i18n/tra
         ctx.fillRect(0, 0, exportSize, exportSize);
       }
 
-      ctx.drawImage(img, 0, 0, exportSize, exportSize);
+      const offset = Math.round((exportSize - iconSize) / 2);
+      ctx.drawImage(img, offset, offset, iconSize, iconSize);
       URL.revokeObjectURL(url);
 
       const pngUrl = canvas.toDataURL("image/png");
       const link = document.createElement("a");
-      link.download = `apatch-icon-${currentColor.replace("#", "")}-${exportSize}x${exportSize}${bgEnabled ? "-bg" : ""}.png`;
+      link.download = `apatch-icon-${currentColor.replace("#", "")}-${exportSize}x${exportSize}-${iconSize}px${bgEnabled ? "-bg" : ""}.png`;
       link.href = pngUrl;
       link.click();
       setStatus(tr("pngExported", `${exportSize}x${exportSize}`));
@@ -800,13 +802,16 @@ import { locales, defaultLocale, translations as i18nStrings } from "../i18n/tra
 
   downloadSvgBtn.addEventListener("click", () => {
     try {
-      const svgEl = getCleanSvg(exportSize);
+      const iconSize = Math.round(exportSize * previewScale);
+      const svgEl = getCleanSvg(iconSize);
       const svgData = new XMLSerializer().serializeToString(svgEl);
-      const filename = `apatch-icon-${currentColor.replace("#", "")}-${exportSize}x${exportSize}${bgEnabled ? "-bg" : ""}.svg`;
+      const offset = Math.round((exportSize - iconSize) / 2);
+      const filename = `apatch-icon-${currentColor.replace("#", "")}-${exportSize}x${exportSize}-${iconSize}px${bgEnabled ? "-bg" : ""}.svg`;
 
-      if (bgEnabled) {
-        const bgColor = darkenColor(currentColor, 0.82);
-        const wrappedSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="${exportSize}" height="${exportSize}" viewBox="0 0 ${exportSize} ${exportSize}"><rect width="100%" height="100%" fill="${bgColor}"/>${svgData}</svg>`;
+      if (bgEnabled || previewScale < 1) {
+        const bgColor = bgEnabled ? darkenColor(currentColor, 0.82) : "none";
+        const rect = bgColor !== "none" ? `<rect width="100%" height="100%" fill="${bgColor}"/>` : "";
+        const wrappedSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="${exportSize}" height="${exportSize}" viewBox="0 0 ${exportSize} ${exportSize}">${rect}<g transform="translate(${offset}, ${offset})">${svgData}</g></svg>`;
         downloadBlob(new Blob([wrappedSvg], { type: "image/svg+xml;charset=utf-8" }), filename);
       } else {
         downloadBlob(new Blob([svgData], { type: "image/svg+xml;charset=utf-8" }), filename);
