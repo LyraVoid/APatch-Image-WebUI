@@ -16,6 +16,8 @@ Generate icons in any color for [APatch](https://github.com/bmax121/APatch). Pic
 - 🎨 **16 preset palettes** — Material Design colors + original APatch green + more
 - 🖌️ **Custom color** — Native color picker + HEX input with live preview
 - 🌙 **Adaptive background** — Optional dark background layer (Android adaptive icon style)
+- 📐 **Custom export size** — Choose from 64 to 2048 px in 64 px steps
+- 🧾 **SVG export** — Download clean vector output in addition to PNG
 - 🌓 **Dark mode** — Follows system preference or manual toggle
 - 📱 **Responsive design** — Works on phones, tablets, and desktops
 - ⚡ **Pure frontend** — No backend needed, just open and use
