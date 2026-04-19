@@ -362,9 +362,11 @@ import { locales, defaultLocale, translations as i18nStrings } from "../i18n/tra
   if (!supportedLocales.includes(currentLocale)) currentLocale = "en";
 
   function tr(key, ...args) {
-    const fn = translations[currentLocale]?.[key];
-    if (typeof fn === "function") return fn(...args);
-    return fn || key;
+    let text = translations[currentLocale]?.[key] || translations["en"]?.[key] || key;
+    args.forEach((arg, i) => {
+      text = text.replace(new RegExp(`\\{${i}\\}`, "g"), arg);
+    });
+    return text;
   }
 
   function applyTranslations() {
